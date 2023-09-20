@@ -51,7 +51,7 @@ const getBet = (balance, lines) => {
         if (isNaN(betAmount) || betAmount <= 0 || betAmount > balance / lines) {
             console.log("Invalid bet amount. Try again.");
         } else {
-            return nrOfLines;
+            return betAmount;
         }
     }
 }
@@ -78,28 +78,49 @@ const spin = () => {
 };
 
 const transpose = (reels) => {
-    const rows = [];
+    const transposedRows = [];
 
     for (let i = 0; i < rows; i++) {
-        rows.push([]);
+        transposedRows.push([]);
         for (let j = 0; j < cols; j++) {
-            rows[i].push(reels[j][i]);
+            transposedRows[i].push(reels[j][i]);
         }
     }
-    return rows;
+    return transposedRows;
 }
 
 const printRows = (rows) => {
-    for(const row of rows) {
+    for (const row of rows) {
         let rowString = "";
-        for(const [i, symbol] of rows.entries){
+        for (const [i, symbol] of row.entries()) {
             rowString += symbol;
-            if(i != rows.length - 1){
+            if (i !== row.length - 1) {
                 rowString += " |";
             }
         }
         console.log(rowString);
-}}
+    }
+};
+
+const getWinnings = (rows, bet, lines) => {
+    let winnings = 0;
+
+    for(let row = 0; row < lines; row++){
+        const symbols = rows[row];
+        let allSame = true;
+
+        for(const symbol of symbols) {
+            if(symbol != symbols[0]){
+                allSame = false;
+                break;
+            }
+        }
+        if(allSame){
+            winnings += bet * symbolValues[symbols[0]];
+        }
+    }
+    return winnings;
+}
 
 let balance = deposit();
 const nrOfLines = getNumberOfLines();
@@ -107,3 +128,5 @@ const bet = getBet(balance, nrOfLines);
 const reels = spin();
 const rowsToTr = transpose(reels);
 printRows(rowsToTr);
+const winnings = getWinnings(rowsToTr, bet, nrOfLines);
+console.log("You won "+ winnings.toString() + "$!");
